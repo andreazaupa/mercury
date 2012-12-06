@@ -4,6 +4,7 @@ class Mercury::ImagesController < MercuryController
 
   # POST /images.json
   def create
+    Rails.logger.error("DBG #{params[:inspect]}" )
     @image = Mercury::Image.new(params[:image])
     @image.save
     respond_with @image

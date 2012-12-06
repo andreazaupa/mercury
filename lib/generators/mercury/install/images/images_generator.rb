@@ -10,13 +10,21 @@ module Mercury
 
         class_option :orm, :default => 'active_record', :banner => 'mongoid',
                      :desc => 'ORM for required models -- active_record, or mongoid'
+        class_option :processor, :default => "paperclip", :banner => 'carrierwave',
+                     :desc => 'processor -- paperclip, or carrierwave'
 
         def copy_models
           if options[:orm] == 'mongoid'
             copy_file 'mongoid_paperclip_image.rb', 'app/models/mercury/image.rb'
           else
-            copy_file 'ar_paperclip_image.rb', 'app/models/mercury/image.rb'
-            migration_template 'ar_paperclip_image_migration.rb', 'db/migrate/create_mercury_images.rb'
+            if options[:processor]=="carrierwave"
+              copy_file 'ar_carrierwave_image.rb', 'app/models/mercury/image.rb'
+              copy_file 'ar_carrierwave_image_uploader.rb', 'app/models/mercury/image_uploader.rb'
+              migration_template 'ar_carrierwave_image_migration.rb', 'db/migrate/create_mercury_images.rb'
+            else
+              copy_file 'ar_paperclip_image.rb', 'app/models/mercury/image.rb'
+              migration_template 'ar_paperclip_image_migration.rb', 'db/migrate/create_mercury_images.rb'
+            end
           end
         end
 
@@ -31,7 +39,14 @@ module Mercury
         end
 
         def add_gemfile_dependencies
-          append_to_file "Gemfile", %Q{gem 'paperclip'}
+
+          if options[:processor] == 'carrierwave'
+            append_to_file "Gemfile", %Q{gem 'rmagick'\n}
+            append_to_file "Gemfile", %Q{gem 'carrierwave'\n}
+          else
+            append_to_file "Gemfile", %Q{gem 'paperclip'\n}
+          end
+
           if options[:orm] == 'mongoid'
             append_to_file "Gemfile", %Q{gem 'mongoid-paperclip', :require => 'mongoid_paperclip'}
           end
