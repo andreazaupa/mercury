@@ -102,7 +102,9 @@ install the layout and css files.
 Mercury has a basic facility for allowing image uploads, and we provide a generator that can act as a starting point for
 your own back end integration.  To install run the generator.
 
-    rails generate mercury:install:images
+    rails generate mercury:install:images #--processor=carrierwave ## if you want to use carrierwave instead of paperclip.
+
+
 
 For Mongoid + MongoDB, you can use the `--orm=mongoid` option on the generator to get the appropriate model added to
 your app.  This generator also puts paperclip (and mongoid_paperclip if needed) into your Gemfile, so make sure to
